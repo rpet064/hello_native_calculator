@@ -1,8 +1,9 @@
 // React Native Counter Example using Hooks!
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {View, Text, TouchableOpacity, StyleSheet, Platform} from 'react-native'
 import { StatusBar } from "expo-status-bar"
+
 
 const numArray = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 const operatorArray = ["+", "-", "×", "÷"]
@@ -16,12 +17,21 @@ const symbolsArray = [
   ]
 
 const App = () => {
-
   const [firstCalculatorInput, setFirstCalculatorInput] = useState<string[]>([])
   const [secondCalculatorInput, setSecondCalculatorInput] = useState<string[]>([])
   const [prevInput, setPrevInput] = useState<string>("")
   const [operator, setOperator] = useState("")
   const [showAnswer, setShowAnswer] = useState<boolean>(false)
+  const [screenTextHasOverflow, setScreenTextHasOverflow ] = useState<boolean>(false)
+
+  // Checks length of inputs and changes style (class) of large text
+  // on calcuator screen to style (class) with smaller font size
+  // largeScreenTextNoOverflow -> largeScreenTextOverflow -> ExtraLargeScreenTextNoOverflow
+  useEffect(() => {
+    if (firstCalculatorInput.length + secondCalculatorInput.length > 5){
+      setScreenTextHasOverflow(true)
+    }
+  }, [firstCalculatorInput, secondCalculatorInput])
 
 
   // this function stores the last equation 
@@ -85,6 +95,9 @@ const App = () => {
       setOperator("")
     }
     setSecondCalculatorInput([])
+    if (firstCalculatorInput.length + secondCalculatorInput.length > 5){
+      setScreenTextHasOverflow(false)
+    }
   }
 
   // clear calculator input arrays
@@ -94,6 +107,7 @@ const App = () => {
     setSecondCalculatorInput([])
     setPrevInput("")
     setShowAnswer(false)
+    setScreenTextHasOverflow(false)
   }
 
   // This function checks 
@@ -250,8 +264,8 @@ const App = () => {
   // this const catches userinput from button and triggers correct function accordingly
   const handleUserInput = (userInput: string) => {
 
-    // checks that the equation isn't too big (max length excluding operator is 16)
-    if (firstCalculatorInput.length + secondCalculatorInput.length < 10) {
+    // checks that the equation isn't too big (max length excluding operator is 15)
+    if (firstCalculatorInput.length + secondCalculatorInput.length < 14) {
 
       if (numArray.includes(userInput)) {
         onInputNumber(userInput)
@@ -295,7 +309,15 @@ const App = () => {
           <Text style={styles.smallScreenText}>{prevInput}</Text>
         </View>
         <View>
-          <Text style={styles.largeScreenText}>{firstCalculatorInput}  {operator}  {secondCalculatorInput}</Text>
+
+        {!screenTextHasOverflow && <Text 
+        style={styles.largeScreenTextNoOverflow}> {firstCalculatorInput} {operator} {secondCalculatorInput}
+        </Text>}
+
+        {screenTextHasOverflow && <Text 
+        style={styles.largeScreenTextOverflow}> {firstCalculatorInput} {operator} {secondCalculatorInput}
+        </Text>}
+
         </View>
       </View>
       <View style={styles.calculatorKeypad}>
@@ -332,16 +354,32 @@ const styles = StyleSheet.create({
     padding: 18.66,
     position: 'relative',
     top: 110,
-    left: 100,
+    left: 127.5,
     fontSize: 20,
   },
-  largeScreenText: {
+  answer: {
     color: 'white',
     padding: 18.66,
     position: 'relative',
     top: 110,
-    left: 30,
-    fontSize: 40,
+    left: 127.5,
+    fontSize: 20,
+  },
+  largeScreenTextNoOverflow: {
+    color: 'white',
+    padding: 18.66,
+    position: 'relative',
+    top: 120,
+    left: 5,
+    fontSize: 75,
+  },
+  largeScreenTextOverflow: {
+    color: 'white',
+    padding: 18.66,
+    position: 'relative',
+    top: 120,
+    left: 5,
+    fontSize: 50,
   },
   calculatorKeypad:{
     flex: 1,
@@ -357,7 +395,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: 100,
     padding: 18.66,
-
   },
   buttonText:{
     fontSize: 45,
