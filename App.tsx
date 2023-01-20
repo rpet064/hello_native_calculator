@@ -1,7 +1,9 @@
 // React Native Counter Example using Hooks!
 
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Button, StatusBar,} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Platform} from 'react-native';
+import { StatusBar } from "expo-status-bar";
+
 // import CalculatorButtons from './components/calculatorButtons.tsx'
 
 const symbolsArray = [
@@ -12,9 +14,11 @@ const symbolsArray = [
   "0", "+/-", ".", "="
   ]
 
-
 const App = () => {
-  const [count, setCount] = useState(0);
+
+  const handleInput = (symbol: string) => {
+    console.log(symbol)
+  }
 
   return (
     <View style={styles.container}>
@@ -24,7 +28,7 @@ const App = () => {
       <View style={styles.calculatorKeypad}>
         {symbolsArray.map((symbol, index) => {
           return (
-            <TouchableOpacity onPress={() => console.log({symbol})} key={index} style={styles.calcBtn}>
+            <TouchableOpacity onPress={() => handleInput(symbol)} key={index} style={styles.calcBtn}>
               <Text>{symbol}</Text>
             </TouchableOpacity>
           )
@@ -39,36 +43,28 @@ const App = () => {
 // React Native Styles
 const styles = StyleSheet.create({
   container: {
-    flex: 2,
+    flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-  },
-  button: {
-    alignItems: 'center',
-    backgroundColor: 'red',
-    padding: 10,
-    marginBottom: 10,
-    borderWidth:2,
+
   },
   calculatorScreen:{
-    minHeight: 169.6,
     margin: 'auto',
+    minHeight: '37.5%',
   },
   calculatorKeypad:{
-    minHeight: '100%',
-    display: 'flex',
+    flex: 1,
     flexWrap: 'wrap',
-    padding: '0 0.1%',
+    minHeight: '62.5%',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
   },
   calcBtn:{
-    flex: 4,
+    flexBasis: '24.9%',
     backgroundColor: '#FFFAE7',
     color: '#181D31',
-    minHeight: 68,
     fontSize: 52,
-    border: '#181D31 1px solid',
   }
 });
 
