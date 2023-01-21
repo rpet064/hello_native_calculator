@@ -1,7 +1,7 @@
 // React Native Counter Example using Hooks!
 
-import React, {useState, useEffect} from 'react'
-import {View, Text, TouchableOpacity, StyleSheet, Platform} from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native'
 import { StatusBar } from "expo-status-bar"
 
 
@@ -14,7 +14,7 @@ const symbolsArray = [
   "4", "5", "6", "-",
   "1", "2", "3", "+",
   "0", "+/-", ".", "="
-  ]
+]
 
 const App = () => {
   const [firstCalculatorInput, setFirstCalculatorInput] = useState<string[]>([])
@@ -22,24 +22,54 @@ const App = () => {
   const [prevInput, setPrevInput] = useState<string>("")
   const [operator, setOperator] = useState("")
   const [showAnswer, setShowAnswer] = useState<boolean>(false)
-  const [screenTextHasOverflow, setScreenTextHasOverflow ] = useState<boolean>(false)
+  const [screenTextHasOverflow, setScreenTextHasOverflow] = useState<boolean>(false)
 
   // Checks length of inputs and changes style (class) of large text
   // on calcuator screen to style (class) with smaller font size
   // largeScreenTextNoOverflow -> largeScreenTextOverflow -> ExtraLargeScreenTextNoOverflow
-  useEffect(() => {
-    if (firstCalculatorInput.length + secondCalculatorInput.length > 5){
-      setScreenTextHasOverflow(true)
+  const handleCalculatorMainScreen = () => {
+    if (firstCalculatorInput.length + secondCalculatorInput.length > 5) {
+      if (firstCalculatorInput.length + secondCalculatorInput.length > 9) {
+        return (
+          <Text
+            style={styles.extraLargeScreenTextOverflow}> {firstCalculatorInput} {operator} {secondCalculatorInput}
+          </Text>
+        )
+      } else {
+        return (
+          <Text
+            style={styles.largeScreenTextOverflow}> {firstCalculatorInput} {operator} {secondCalculatorInput}
+          </Text>
+        )
+      }
+    } else {
+      return (
+        <Text
+          style={styles.largeScreenTextNoOverflow}> {firstCalculatorInput} {operator} {secondCalculatorInput}
+        </Text>)
     }
-  }, [firstCalculatorInput, secondCalculatorInput])
+  }
 
+  const handleInputExceedsMaximum = (userInput: string) => {
+    if (userInput === "AC") {
+      resetCalculator()
+    } else if (userInput === "=") {
+      solveEquation("")
+    } else if (userInput === "C") {
+      deletePrevInput()
+    } else {
+
+      // will trigger alert if user tries to add more numbers
+      alert("More integers cannot be added to calculator")
+    }
+  }
 
   // this function stores the last equation 
   const updatePrevArray = (firstNum: number, secondNum: number) => {
     var prev_equation_string = ''
 
     // Store the first input if there are no previous inputs
-    var prev_equation = [firstNum, "  ", operator, "  ", secondNum, "  ", "  =  "]
+    var prev_equation = [firstNum, " ", operator, " ", secondNum, " = "]
     prev_equation_string = prev_equation.toString().replaceAll(',', '')
     setPrevInput(prev_equation_string)
   }
@@ -65,25 +95,25 @@ const App = () => {
   }
 
   const handleCalculations = (firstNum: number, secondNum: number) => {
-   let answer: number = 0
-  if (operator === "+"){
-    answer =  firstNum + secondNum;
-  } else if (operator === "-"){
-    answer =  firstNum - secondNum;
-  } else if (operator === "÷"){
-    answer =  firstNum / secondNum;
-  } else if (operator === "×"){
-    answer =  firstNum * secondNum;
+    let answer: number = 0
+    if (operator === "+") {
+      answer = firstNum + secondNum;
+    } else if (operator === "-") {
+      answer = firstNum - secondNum;
+    } else if (operator === "÷") {
+      answer = firstNum / secondNum;
+    } else if (operator === "×") {
+      answer = firstNum * secondNum;
+    }
+    // bug in js floats returns strange answers - rounded to hide decimal inconsistency
+    let roundedAnswer = answer.toFixed(5);
+
+    // check decimal needed (not .00) - answer from multiplying large numbers causes displayed text to overflow div
+    if (roundedAnswer.split('.')[1] === "00000") {
+      roundedAnswer = roundedAnswer.split('.')[0];
+    }
+    return roundedAnswer.toString()
   }
-  // bug in js floats returns strange answers - rounded to hide decimal inconsistency
-  let roundedAnswer = answer.toFixed(5);
-      
-  // check decimal needed (not .00) - answer from multiplying large numbers causes displayed text to overflow div
-  if (roundedAnswer.split('.')[1] === "00000"){
-    roundedAnswer = roundedAnswer.split('.')[0];
-  }
-  return roundedAnswer.toString()
-}
 
   // this function will clear the second input and check if user has already
   // inputted operator for new equation
@@ -95,10 +125,12 @@ const App = () => {
       setOperator("")
     }
     setSecondCalculatorInput([])
-    if (firstCalculatorInput.length + secondCalculatorInput.length > 5){
+    if (firstCalculatorInput.length + secondCalculatorInput.length > 5) {
       setScreenTextHasOverflow(false)
     }
   }
+
+
 
   // clear calculator input arrays
   const resetCalculator = () => {
@@ -112,22 +144,21 @@ const App = () => {
 
   // This function checks 
   const deletePrevInput = () => {
+    let arrayIntoString: string
+
     // Removes last inputted number from first input array
     if (operator === "") {
+      arrayIntoString = firstCalculatorInput.join('').slice(0, -1)
+      let stringIntoArray: Array<string> = [arrayIntoString]
+      setFirstCalculatorInput(stringIntoArray)
 
-      let new_input: Array<string>
-      new_input = firstCalculatorInput.splice(-1)
-      setFirstCalculatorInput(new_input)
-
-
-    // Removes last inputted number from second input array
+      // Removes last inputted number from second input array
     } else if (secondCalculatorInput.length > 0) {
+      arrayIntoString = firstCalculatorInput.join('').slice(0, -1)
+      let stringIntoArray: Array<string> = [arrayIntoString]
+      setSecondCalculatorInput(stringIntoArray)
 
-      let new_input: Array<string>
-      new_input = secondCalculatorInput.splice(-1)
-      setSecondCalculatorInput(new_input)
-
-    // Catches exception where user wants to delete the operator
+      // Catches exception where user wants to delete the operator
     } else {
       setOperator("")
     }
@@ -182,7 +213,7 @@ const App = () => {
         setSecondCalculatorInput([dividedNumberString])
       }
     }
-    let prevInputString = " √ "  + originalNumber
+    let prevInputString = " √ " + originalNumber
     setPrevInput(prevInputString)
   }
 
@@ -288,17 +319,7 @@ const App = () => {
         onSquareRoot()
       }
     } else {
-
-      // clears screen when is full
-      if (userInput === "AC") {
-        resetCalculator()
-      } else if (userInput === "=") {
-        solveEquation("")
-      } else {
-
-        // will trigger alert if user tries to add more numbers
-        alert("More integers cannot be added to calculator")
-      }
+      handleInputExceedsMaximum(userInput)
     }
   }
 
@@ -310,13 +331,7 @@ const App = () => {
         </View>
         <View>
 
-        {!screenTextHasOverflow && <Text 
-        style={styles.largeScreenTextNoOverflow}> {firstCalculatorInput} {operator} {secondCalculatorInput}
-        </Text>}
-
-        {screenTextHasOverflow && <Text 
-        style={styles.largeScreenTextOverflow}> {firstCalculatorInput} {operator} {secondCalculatorInput}
-        </Text>}
+          {handleCalculatorMainScreen()}
 
         </View>
       </View>
@@ -330,7 +345,7 @@ const App = () => {
         })
         }
       </View>
-      
+
     </View>
   )
 }
@@ -343,52 +358,51 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  calculatorScreen:{
+  calculatorScreen: {
     margin: 'auto',
     minHeight: '41%',
     backgroundColor: 'black',
     minWidth: '100%',
+    alignItems: 'center',
   },
   smallScreenText: {
     color: 'white',
     padding: 18.66,
     position: 'relative',
-    top: 110,
-    left: 127.5,
-    fontSize: 20,
-  },
-  answer: {
-    color: 'white',
-    padding: 18.66,
-    position: 'relative',
-    top: 110,
-    left: 127.5,
-    fontSize: 20,
+    top: 100,
+    fontSize: 30,
   },
   largeScreenTextNoOverflow: {
     color: 'white',
     padding: 18.66,
     position: 'relative',
-    top: 120,
-    left: 5,
-    fontSize: 75,
+    top: 100,
+    fontSize: 80,
   },
   largeScreenTextOverflow: {
     color: 'white',
     padding: 18.66,
     position: 'relative',
-    top: 120,
-    left: 5,
+    alignItems: 'center',
+    top: 100,
     fontSize: 50,
   },
-  calculatorKeypad:{
+  extraLargeScreenTextOverflow: {
+    color: 'white',
+    padding: 18.66,
+    position: 'relative',
+    alignItems: 'center',
+    top: 100,
+    fontSize: 35,
+  },
+  calculatorKeypad: {
     flex: 1,
     flexWrap: 'wrap',
     minHeight: '59%',
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },
-  calcBtn:{
+  calcBtn: {
     flexBasis: '25%',
     backgroundColor: '#FFFAE7',
     color: '#181D31',
@@ -396,7 +410,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
     padding: 18.66,
   },
-  buttonText:{
+  buttonText: {
     fontSize: 45,
   }
 })
