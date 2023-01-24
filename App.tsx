@@ -1,8 +1,5 @@
-// React Native Counter Example using Hooks!
-
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native'
-import { StatusBar } from "expo-status-bar"
 
 
 const numArray = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
@@ -22,7 +19,6 @@ const App = () => {
   const [prevInput, setPrevInput] = useState<string>("")
   const [operator, setOperator] = useState("")
   const [showAnswer, setShowAnswer] = useState<boolean>(false)
-  const [screenTextHasOverflow, setScreenTextHasOverflow] = useState<boolean>(false)
 
   // Checks length of inputs and changes style (class) of large text
   // on calcuator screen to style (class) with smaller font size
@@ -125,9 +121,6 @@ const App = () => {
       setOperator("")
     }
     setSecondCalculatorInput([])
-    if (firstCalculatorInput.length + secondCalculatorInput.length > 5) {
-      setScreenTextHasOverflow(false)
-    }
   }
 
 
@@ -139,7 +132,6 @@ const App = () => {
     setSecondCalculatorInput([])
     setPrevInput("")
     setShowAnswer(false)
-    setScreenTextHasOverflow(false)
   }
 
   // This function checks 
@@ -149,13 +141,13 @@ const App = () => {
     // Removes last inputted number from first input array
     if (operator === "") {
       arrayIntoString = firstCalculatorInput.join('').slice(0, -1)
-      let stringIntoArray: Array<string> = [arrayIntoString]
+      let stringIntoArray: Array<string> =  arrayIntoString.split('')
       setFirstCalculatorInput(stringIntoArray)
 
       // Removes last inputted number from second input array
     } else if (secondCalculatorInput.length > 0) {
-      arrayIntoString = firstCalculatorInput.join('').slice(0, -1)
-      let stringIntoArray: Array<string> = [arrayIntoString]
+      arrayIntoString = secondCalculatorInput.join('').slice(0, -1)
+      let stringIntoArray: Array<string> =  arrayIntoString.split('')
       setSecondCalculatorInput(stringIntoArray)
 
       // Catches exception where user wants to delete the operator
@@ -330,9 +322,7 @@ const App = () => {
           <Text style={styles.smallScreenText}>{prevInput}</Text>
         </View>
         <View>
-
           {handleCalculatorMainScreen()}
-
         </View>
       </View>
       <View style={styles.calculatorKeypad}>
@@ -376,8 +366,8 @@ const styles = StyleSheet.create({
     color: 'white',
     padding: 18.66,
     position: 'relative',
-    top: 100,
-    fontSize: 80,
+    top: 97.5,
+    fontSize: 82.5,
   },
   largeScreenTextOverflow: {
     color: 'white',
