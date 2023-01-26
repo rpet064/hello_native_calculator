@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-
 
 const numArray = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 const operatorArray = ["+", "-", "×", "÷"]
@@ -25,15 +24,21 @@ const App = () => {
   const [operator, setOperator] = useState("")
   const [showAnswer, setShowAnswer] = useState<boolean>(false)
 
+  // This function renders buttons with varying css on text colour and background colour.
+  // Its alternative for nth child which cannot be applied in React Native  
   const handleCalculatorKeyboard = () => {
     return (
       symbolsArray.map((symbol, index) => {
+
+        // Red Buttons with white text
         if (colouredButtons.blueBtn.includes(symbol)) {
           return (
             <TouchableOpacity onPress={() => handleUserInput(symbol)} key={index} style={styles.calcBtnBlue}>
               <Text style={styles.buttonTextLight}>{symbol}</Text>
             </TouchableOpacity>
           )
+
+        // Purple Buttons with white text
         } else if (colouredButtons.purpleBtn.includes(symbol)) {
           return (
             <TouchableOpacity onPress={() => handleUserInput(symbol)} key={index} style={styles.calcBtnPurple}>
@@ -41,6 +46,7 @@ const App = () => {
             </TouchableOpacity>
           )
 
+        // Red Buttons with white text
         } else if (colouredButtons.redBtn.includes(symbol)) {
           return (
             <TouchableOpacity onPress={() => handleUserInput(symbol)} key={index} style={styles.calcBtnRed}>
@@ -48,6 +54,7 @@ const App = () => {
             </TouchableOpacity>
           )
 
+        // Other Buttons with black text & black background
         } else {
           return (
             <TouchableOpacity onPress={() => handleUserInput(symbol)} key={index} style={styles.calcBtn}>
@@ -80,7 +87,6 @@ const App = () => {
         )
       }
     } else {
-      alert("No Overflow")
       return (
         <Text
           style={styles.largeScreenTextNoOverflow}> {firstCalculatorInput} {operator} {secondCalculatorInput}
@@ -88,6 +94,7 @@ const App = () => {
     }
   }
 
+  // manages the app inputs when the screen is full (max is 15 integers excl an operator)
   const handleInputExceedsMaximum = (userInput: string) => {
     if (userInput === "AC") {
       resetCalculator()
@@ -95,6 +102,10 @@ const App = () => {
       solveEquation("")
     } else if (userInput === "C") {
       deletePrevInput()
+    } else if (userInput === "√"){
+      onSquareRoot()
+    } else if (userInput === "+/-"){
+      changeSign()
     } else {
 
       // will trigger alert if user tries to add more numbers
@@ -117,21 +128,24 @@ const App = () => {
   const solveEquation = async (newOperator: string) => {
     if (secondCalculatorInput.length !== 0) {
 
-      let firstNum: number
+      let firstNum, secondNum: number
       firstNum = parseFloat(firstCalculatorInput.join(''))
-
-      let secondNum: number
       secondNum = parseFloat(secondCalculatorInput.join(''))
 
       updatePrevArray(firstNum, secondNum)
       setShowAnswer(true)
+      
+      // Find answer, change to array, then add to state
       var answer: string
       answer = handleCalculations(firstNum, secondNum)
-      setFirstCalculatorInput([answer])
+      var answerArray = answer.split('')
+      setFirstCalculatorInput(answerArray)
+
       clearNumbers(newOperator)
     }
   }
 
+  // Manages the final calculation 
   const handleCalculations = (firstNum: number, secondNum: number) => {
     let answer: number = 0
     if (operator === "+") {
@@ -164,8 +178,6 @@ const App = () => {
     }
     setSecondCalculatorInput([])
   }
-
-
 
   // clear calculator input arrays
   const resetCalculator = () => {
@@ -230,23 +242,56 @@ const App = () => {
   const onSquareRoot = () => {
 
     // error when negative number is square rooted
-    let originalNumber = 0
+    let originalNumber, originalNumberNoNegative = 0
     let dividedNumberString = ""
+    let dividedNumberArray: string[]
+
     if (operator === '') {
       if (firstCalculatorInput.length) {
-        originalNumber = parseInt(firstCalculatorInput.toString().replaceAll(',', ''))
-        dividedNumberString = (Math.sqrt(originalNumber)).toFixed(2).toString()
-        setFirstCalculatorInput([dividedNumberString])
+
+        // Check if there is a negative number
+        if (firstCalculatorInput.includes("-")){
+          originalNumber = parseInt(firstCalculatorInput.toString().replaceAll(',', ''))
+          originalNumberNoNegative = parseInt(firstCalculatorInput.toString().replaceAll(',', '').replace('-', ''))
+
+          // Solves, rounds to 2d.p, adds negative sign back in and puts back into array
+          dividedNumberString = (Math.sqrt(originalNumberNoNegative)).toFixed(2).toString()
+
+          dividedNumberArray = dividedNumberString.split('')
+          dividedNumberArray.unshift("-")
+          setFirstCalculatorInput(dividedNumberArray)
+        } else {
+          originalNumber = parseInt(firstCalculatorInput.toString().replaceAll(',', ''))
+          
+          // Solves, rounds to 2d.p & puts back into array
+          dividedNumberString = (Math.sqrt(originalNumber)).toFixed(2).toString()
+          dividedNumberArray = dividedNumberString.split('')
+          setFirstCalculatorInput(dividedNumberArray)
+        }
       }
     } else {
 
-      // Needs fixing
-      if (secondCalculatorInput.length) {
-        originalNumber = parseInt(firstCalculatorInput.toString().replaceAll(',', ''))
-        dividedNumberString = (Math.sqrt(originalNumber)).toFixed(2).toString()
-        setSecondCalculatorInput([dividedNumberString])
+         // Check if there is a negative number
+        if (secondCalculatorInput.includes("-")){
+          originalNumber = parseInt(secondCalculatorInput.toString().replaceAll(',', ''))
+          originalNumberNoNegative = parseInt(secondCalculatorInput.toString().replaceAll(',', '').replace('-', ''))
+
+          // Solves, rounds to 2d.p, adds negative sign back in and puts back into array
+          dividedNumberString = (Math.sqrt(originalNumberNoNegative)).toFixed(2).toString()
+
+          dividedNumberArray = dividedNumberString.split('')
+          dividedNumberArray.unshift("-")
+          setFirstCalculatorInput(dividedNumberArray)
+        } else {
+          originalNumber = parseInt(secondCalculatorInput.toString().replaceAll(',', ''))
+          
+          // Solves, rounds to 2d.p & puts back into array
+          dividedNumberString = (Math.sqrt(originalNumber)).toFixed(2).toString()
+          dividedNumberArray = dividedNumberString.split('')
+          setSecondCalculatorInput(dividedNumberArray)
+        }
       }
-    }
+    // Assign prev calculation to show on calculator screen
     let prevInputString = " √ " + originalNumber
     setPrevInput(prevInputString)
   }
