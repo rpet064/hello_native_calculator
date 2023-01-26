@@ -25,7 +25,7 @@ const App = () => {
   const [showAnswer, setShowAnswer] = useState<boolean>(false)
 
   // This function renders buttons with varying css on text colour and background colour.
-  // Its alternative for nth child which cannot be applied in React Native  
+  // Its alternative for nth child which cannot be applied in React Native
   const handleCalculatorKeyboard = () => {
     return (
       symbolsArray.map((symbol, index) => {
@@ -337,7 +337,7 @@ const App = () => {
         setOperator(userInput)
       }
     } else {
-      
+
       // Submits for solving and saves second operator for new calculation
       setOperator(userInput)
       solveEquation(userInput)
