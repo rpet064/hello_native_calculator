@@ -1,9 +1,14 @@
 import React, { useState } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 
 
 const numArray = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 const operatorArray = ["+", "-", "×", "÷"]
+const colouredButtons = {
+  "blueBtn": ["AC", "C", "√"],
+  "purpleBtn": operatorArray,
+  "redBtn": ["="]
+}
 
 const symbolsArray = [
   "AC", "C", "√", "÷",
@@ -19,13 +24,51 @@ const App = () => {
   const [prevInput, setPrevInput] = useState<string>("")
   const [operator, setOperator] = useState("")
   const [showAnswer, setShowAnswer] = useState<boolean>(false)
+  const [largeScreenOverflow, setLargeScreenOverflow] = useState<boolean>(false)
+  const [extraLargeScreenOverflow, setExtraLargeScreenOverflow] = useState<boolean>(false)
+
+  const handleCalculatorKeyboard = () => {
+    return (
+      symbolsArray.map((symbol, index) => {
+        if (colouredButtons.blueBtn.includes(symbol)) {
+          return (
+            <TouchableOpacity onPress={() => handleUserInput(symbol)} key={index} style={styles.calcBtnBlue}>
+              <Text style={styles.buttonTextLight}>{symbol}</Text>
+            </TouchableOpacity>
+          )
+        } else if (colouredButtons.purpleBtn.includes(symbol)) {
+          return (
+            <TouchableOpacity onPress={() => handleUserInput(symbol)} key={index} style={styles.calcBtnPurple}>
+              <Text style={styles.buttonTextLight}>{symbol}</Text>
+            </TouchableOpacity>
+          )
+
+        } else if (colouredButtons.redBtn.includes(symbol)) {
+          return (
+            <TouchableOpacity onPress={() => handleUserInput(symbol)} key={index} style={styles.calcBtnRed}>
+              <Text style={styles.buttonTextLight}>{symbol}</Text>
+            </TouchableOpacity>
+          )
+
+        } else {
+          return (
+            <TouchableOpacity onPress={() => handleUserInput(symbol)} key={index} style={styles.calcBtn}>
+              <Text style={styles.buttonTextDark}>{symbol}</Text>
+            </TouchableOpacity>
+          )
+        }
+
+      })
+
+    )
+  }
 
   // Checks length of inputs and changes style (class) of large text
   // on calcuator screen to style (class) with smaller font size
   // largeScreenTextNoOverflow -> largeScreenTextOverflow -> ExtraLargeScreenTextNoOverflow
   const handleCalculatorMainScreen = () => {
-    if (firstCalculatorInput.length + secondCalculatorInput.length > 5) {
-      if (firstCalculatorInput.length + secondCalculatorInput.length > 9) {
+    if (firstCalculatorInput.length + secondCalculatorInput.length > 5 || largeScreenOverflow) {
+      if (firstCalculatorInput.length + secondCalculatorInput.length > 9 || extraLargeScreenOverflow) {
         return (
           <Text
             style={styles.extraLargeScreenTextOverflow}> {firstCalculatorInput} {operator} {secondCalculatorInput}
@@ -141,13 +184,13 @@ const App = () => {
     // Removes last inputted number from first input array
     if (operator === "") {
       arrayIntoString = firstCalculatorInput.join('').slice(0, -1)
-      let stringIntoArray: Array<string> =  arrayIntoString.split('')
+      let stringIntoArray: Array<string> = arrayIntoString.split('')
       setFirstCalculatorInput(stringIntoArray)
 
       // Removes last inputted number from second input array
     } else if (secondCalculatorInput.length > 0) {
       arrayIntoString = secondCalculatorInput.join('').slice(0, -1)
-      let stringIntoArray: Array<string> =  arrayIntoString.split('')
+      let stringIntoArray: Array<string> = arrayIntoString.split('')
       setSecondCalculatorInput(stringIntoArray)
 
       // Catches exception where user wants to delete the operator
@@ -326,16 +369,8 @@ const App = () => {
         </View>
       </View>
       <View style={styles.calculatorKeypad}>
-        {symbolsArray.map((symbol, index) => {
-          return (
-            <TouchableOpacity onPress={() => handleUserInput(symbol)} key={index} style={styles.calcBtn}>
-              <Text style={styles.buttonText}>{symbol}</Text>
-            </TouchableOpacity>
-          )
-        })
-        }
+        {handleCalculatorKeyboard()}
       </View>
-
     </View>
   )
 }
@@ -398,10 +433,54 @@ const styles = StyleSheet.create({
     color: '#181D31',
     alignItems: 'center',
     minHeight: 100,
-    padding: 18.66,
+    padding: 16.95,
+    borderWidth:1.05, 
+    borderColor:'black', 
+    borderStyle:'solid'
+
   },
-  buttonText: {
+  calcBtnBlue: {
+    flexBasis: '25%',
+    backgroundColor: '#0779E4',
+    color: '#181D31',
+    alignItems: 'center',
+    minHeight: 100,
+    padding: 17.45,
+    borderWidth:1.05, 
+   borderColor:'black', 
+   borderStyle:'solid'
+  },
+  calcBtnPurple: {
+    flexBasis: '25%',
+    backgroundColor: '#9951FF',
+    color: '#181D31',
+    alignItems: 'center',
+    minHeight: 100,
+    padding: 18.66,
+    borderWidth:1.05, 
+    borderColor:'black', 
+    borderStyle:'solid'
+    
+  },
+  calcBtnRed: {
+    flexBasis: '25%',
+    backgroundColor: '#C21010',
+    color: '#181D31',
+    alignItems: 'center',
+    minHeight: 100,
+    padding: 18.66,
+    borderWidth:1.05, 
+    borderColor:'black', 
+    borderStyle:'solid'
+  },
+  buttonTextDark: {
     fontSize: 45,
+    fontWeight: '500',
+  },
+  buttonTextLight: {
+    fontSize: 45,
+    color: '#FFFAE7',
+    fontWeight: '500',
   }
 })
 
