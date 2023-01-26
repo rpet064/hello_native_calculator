@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 
 
@@ -24,8 +24,6 @@ const App = () => {
   const [prevInput, setPrevInput] = useState<string>("")
   const [operator, setOperator] = useState("")
   const [showAnswer, setShowAnswer] = useState<boolean>(false)
-  const [largeScreenOverflow, setLargeScreenOverflow] = useState<boolean>(false)
-  const [extraLargeScreenOverflow, setExtraLargeScreenOverflow] = useState<boolean>(false)
 
   const handleCalculatorKeyboard = () => {
     return (
@@ -67,8 +65,8 @@ const App = () => {
   // on calcuator screen to style (class) with smaller font size
   // largeScreenTextNoOverflow -> largeScreenTextOverflow -> ExtraLargeScreenTextNoOverflow
   const handleCalculatorMainScreen = () => {
-    if (firstCalculatorInput.length + secondCalculatorInput.length > 5 || largeScreenOverflow) {
-      if (firstCalculatorInput.length + secondCalculatorInput.length > 9 || extraLargeScreenOverflow) {
+    if (firstCalculatorInput.length + secondCalculatorInput.length > 4) {
+      if (firstCalculatorInput.length + secondCalculatorInput.length > 7) {
         return (
           <Text
             style={styles.extraLargeScreenTextOverflow}> {firstCalculatorInput} {operator} {secondCalculatorInput}
@@ -82,6 +80,7 @@ const App = () => {
         )
       }
     } else {
+      alert("No Overflow")
       return (
         <Text
           style={styles.largeScreenTextNoOverflow}> {firstCalculatorInput} {operator} {secondCalculatorInput}
@@ -136,20 +135,20 @@ const App = () => {
   const handleCalculations = (firstNum: number, secondNum: number) => {
     let answer: number = 0
     if (operator === "+") {
-      answer = firstNum + secondNum;
+      answer = firstNum + secondNum
     } else if (operator === "-") {
-      answer = firstNum - secondNum;
+      answer = firstNum - secondNum
     } else if (operator === "÷") {
-      answer = firstNum / secondNum;
+      answer = firstNum / secondNum
     } else if (operator === "×") {
-      answer = firstNum * secondNum;
+      answer = firstNum * secondNum
     }
     // bug in js floats returns strange answers - rounded to hide decimal inconsistency
-    let roundedAnswer = answer.toFixed(5);
+    let roundedAnswer = answer.toFixed(5)
 
     // check decimal needed (not .00) - answer from multiplying large numbers causes displayed text to overflow div
     if (roundedAnswer.split('.')[1] === "00000") {
-      roundedAnswer = roundedAnswer.split('.')[0];
+      roundedAnswer = roundedAnswer.split('.')[0]
     }
     return roundedAnswer.toString()
   }
@@ -402,7 +401,7 @@ const styles = StyleSheet.create({
     padding: 18.66,
     position: 'relative',
     top: 97.5,
-    fontSize: 82.5,
+    fontSize: 85,
   },
   largeScreenTextOverflow: {
     color: 'white',
@@ -410,7 +409,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     top: 100,
-    fontSize: 50,
+    fontSize: 63.1,
   },
   extraLargeScreenTextOverflow: {
     color: 'white',
