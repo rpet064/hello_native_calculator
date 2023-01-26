@@ -325,15 +325,21 @@ const App = () => {
     }
   }
 
-  // handle operator input logic
+  // takes operator input
   const onInputOperator = (userInput: string) => {
     if (operator === '') {
+
+      // checks if a number has been inputted into equation
+      // before adding an operator
       if (firstCalculatorInput.length === 0) {
         alert('please enter a number first')
       } else {
         setOperator(userInput)
       }
     } else {
+      
+      // Submits for solving and saves second operator for new calculation
+      setOperator(userInput)
       solveEquation(userInput)
     }
   }
